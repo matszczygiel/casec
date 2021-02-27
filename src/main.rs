@@ -1,5 +1,6 @@
 use std::{
     io::{Read, Write},
+    path::PathBuf,
     str::{Chars, FromStr},
 };
 
@@ -32,6 +33,8 @@ struct Cli {
     identifiers: Vec<String>,
     #[structopt(long, short)]
     case: Case,
+    #[structopt(long, short, parse(from_os_str))]
+    output: Option<PathBuf>,
 }
 
 fn main() {
@@ -44,7 +47,12 @@ fn main() {
         convert(input, args.identifiers, args.case)
     };
 
-    std::io::stdout().write_all(&res.into_bytes()).unwrap();
+    if let Some(output) = args.output {
+        let mut file = std::fs::File::create(output).unwrap();
+        file.write_all(&res.into_bytes()).unwrap();
+    } else {
+        std::io::stdout().write_all(&res.into_bytes()).unwrap();
+    }
 }
 
 pub fn convert<S>(input: String, patters: impl IntoIterator<Item = S>, case: Case) -> String
