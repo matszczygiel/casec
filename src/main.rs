@@ -24,15 +24,17 @@ impl FromStr for Case {
     }
 }
 
-/// Search for a pattern in stdin
+/// Search for identifiers matching the pattern in the text and change its case.
 #[derive(StructOpt)]
 #[structopt(rename_all = "kebab-case")]
 struct Cli {
-    /// The patterns to look for
+    /// The list of patterns to look for
     #[structopt(long, short)]
-    identifiers: Vec<String>,
+    patterns: Vec<String>,
+    /// Case to change identifier for
     #[structopt(long, short)]
     case: Case,
+    /// Output to file, by default output is written to stdout
     #[structopt(long, short, parse(from_os_str))]
     output: Option<PathBuf>,
 }
@@ -40,18 +42,18 @@ struct Cli {
 fn main() {
     let args = Cli::from_args();
 
-    let res = {
+    let result = {
         let mut input = String::new();
         std::io::stdin().read_to_string(&mut input).unwrap();
 
-        convert(input, args.identifiers, args.case)
+        convert(input, args.patterns, args.case)
     };
 
     if let Some(output) = args.output {
         let mut file = std::fs::File::create(output).unwrap();
-        file.write_all(&res.into_bytes()).unwrap();
+        file.write_all(&result.into_bytes()).unwrap();
     } else {
-        std::io::stdout().write_all(&res.into_bytes()).unwrap();
+        std::io::stdout().write_all(&result.into_bytes()).unwrap();
     }
 }
 
