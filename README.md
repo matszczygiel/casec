@@ -10,3 +10,4 @@ Casec can be installed with the cargo package manager
 cargo install casec
 ```
 or build from source.
+Requires rustc version >= 1.51.
